@@ -1,0 +1,31 @@
+#This script fits a first-order kinetic model to a series of data. 
+
+# The packages below shoude be installed before procedure
+import numpy as np 
+from scipy import stats 
+import matplotlib.pyplot as plt
+
+# Example dataset
+t = np.array([0, 1, 2, 4, 6])           # time (h)
+Ct = np.array([100, 92, 85, 72, 58])     # concentration (mg/kg)
+
+# Normalize concentration to C0
+C0 = Ct[0]
+y = np.log(Ct / C0)
+
+# Linear regression: ln(Ct/C0) = -k1 * t
+slope, intercept, r_value, p_value, se = stats.linregress(t, y)
+k1 = -slope
+t_half = np.log(2) / k1
+
+print(f"Rate constant k1 = {k:.4f} h^-1")
+print(f"Half-life t1/2 = {t_half:.2f} h")
+print(f"R^2 = {r_value**2:.3f}")
+
+# Plot
+plt.scatter(t, y, color="blue", label="Data")
+plt.plot(t, intercept + slope*t, color="red", label="Fit")
+plt.xlabel("Time (h)")
+plt.ylabel("ln(Ct/C0)")
+plt.legend()
+plt.show()

@@ -1,0 +1,66 @@
+# The packages below shoude be installed before procedure
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
+# Example dataset for first-order kinetics (from original script)
+t = np.array([0, 1, 2, 4, 6])          # time (h)
+Ct = np.array([100, 92, 85, 72, 58])   # concentration (mg/kg)
+
+# Normalize concentration to C0
+C0 = Ct[0]
+y = np.log(Ct / C0)
+
+# Linear regression: ln(Ct/C0) = -k1 * t
+slope, intercept, r_value, p_value, se = stats.linregress(t, y)
+k1 = -slope
+t_half = np.log(2) / k1
+
+print(f"Rate constant k1 = {k1:.4f} h^-1")
+print(f"Half-life t1/2 = {t_half:.2f} h")
+print(f"R^2 = {r_value**2:.3f}")
+
+# Plot of first-order kinetics
+plt.scatter(t, y, color="blue", label="Data")
+plt.plot(t, intercept + slope*t, color="red", label="Fit")
+plt.xlabel("Time (h)")
+plt.ylabel("ln(Ct/C0)")
+plt.legend()
+plt.title("First-Order Kinetic Fit")
+plt.show()
+
+#-------------------- Arrhenius Equation Fitting --------------------
+
+# Example Arrhenius data: rate constants (k) at different temperatures (T)
+# NOTE: Temperature must be in Kelvin (K).
+# Let's assume the k1 calculated above was at T = 298 K
+T_kelvin = np.array([273.15, 298.15, 308.15, 318.15, 328.15]) # Temperatures in Kelvin
+k_values = np.array([0.05, 0.10, 0.15, 0.25, 0.35]) # Assumed k values for demonstration
+
+# Convert data for linear regression
+inv_T = 1 / T_kelvin
+ln_k = np.log(k_values)
+
+# Perform linear regression on the Arrhenius plot
+arrhenius_slope, arrhenius_intercept, arrhenius_r, _, _ = stats.linregress(inv_T, ln_k)
+
+# Constants
+R = 8.314  # Universal gas constant in J/mol·K
+
+# Calculate activation energy (Ea) and pre-exponential factor (A)
+Ea = -arrhenius_slope * R
+A = np.exp(arrhenius_intercept)
+
+print("\n--- Arrhenius Equation Fit ---")
+print(f"Activation Energy (Ea) = {Ea/1000:.2f} kJ/mol")
+print(f"Pre-exponential Factor (A) = {A:.2f} h^-1")
+print(f"R^2 for Arrhenius fit = {arrhenius_r**2:.3f}")
+
+# Plot the Arrhenius data
+plt.scatter(inv_T, ln_k, color="green", label="Arrhenius Data")
+plt.plot(inv_T, arrhenius_intercept + arrhenius_slope * inv_T, color="orange", label="Arrhenius Fit")
+plt.xlabel("1/T (K^-1)")
+plt.ylabel("ln(k)")
+plt.legend()
+plt.title("Arrhenius Plot")
+plt.show()

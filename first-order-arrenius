@@ -37,3 +37,7 @@ plt.ylabel("ln(k)")
 plt.legend()
 plt.title("Arrhenius Plot")
 plt.show()
+
+# Add this line to save the figure as a high-resolution PNG
+plt.savefig('arrhenius_plot.png', dpi=300)
+

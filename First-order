@@ -18,7 +18,7 @@ slope, intercept, r_value, p_value, se = stats.linregress(t, y)
 k1 = -slope
 t_half = np.log(2) / k1
 
-print(f"Rate constant k1 = {k:.4f} h^-1")
+print(f"Rate constant k1 = {k1:.4f} h^-1")
 print(f"Half-life t1/2 = {t_half:.2f} h")
 print(f"R^2 = {r_value**2:.3f}")
 
@@ -29,3 +29,6 @@ plt.xlabel("Time (h)")
 plt.ylabel("ln(Ct/C0)")
 plt.legend()
 plt.show()
+
+# Add this line to save the figure as a high-resolution PNG
+plt.savefig('firstorder_plot.png', dpi=300)

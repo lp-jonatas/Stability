@@ -1,0 +1,190 @@
+# Import necessary libraries
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import linregress
+
+def fit_kinetic_models(time, concentration):
+    """
+    Analyzes a given dataset to determine the best-fit chemical kinetic model
+    (zero, first, or second order) using linearized plots and R-squared values.
+
+    Parameters:
+    time (list or numpy.array): The time data.
+    concentration (list or numpy.array): The concentration data.
+    """
+    
+    # Convert input lists to numpy arrays for easier calculations
+    time = np.array(time)
+    concentration = np.array(concentration)
+    
+    # Check for valid data
+    if len(time) != len(concentration) or len(time) < 2:
+        print("Error: Time and concentration data must have the same length and at least two data points.")
+        return
+
+    # Store results for comparison
+    results = {}
+    
+    # Create a figure to hold all plots (linearized and residual)
+    plt.figure(figsize=(18, 12))
+
+    # --- ZERO-ORDER KINETICS ---
+    # Linearized plot: Ct vs. t
+    print("\n--- Testing Zero-Order Model ---")
+    
+    # Perform linear regression on the data
+    zero_order_slope, zero_order_intercept, zero_order_r_value, _, _ = linregress(time, concentration)
+    zero_order_r_squared = zero_order_r_value**2
+    
+    # The rate constant k0 is the negative of the slope
+    k0 = -zero_order_slope
+    
+    # Calculate predicted values and residuals for zero-order
+    predicted_concentration_zero = zero_order_slope * time + zero_order_intercept
+    residuals_zero = concentration - predicted_concentration_zero
+
+    # Store results
+    results['zero_order'] = {'k': k0, 'r_squared': zero_order_r_squared, 'residuals': residuals_zero}
+    
+    # Print results for zero-order model
+    print(f"Linearized equation: [Ct] = [-k0]t + [C0]")
+    print(f"Slope (linearized): {zero_order_slope:.4f}")
+    print(f"Rate constant (k0): {k0:.4f}")
+    print(f"R-squared (R²): {zero_order_r_squared:.4f}")
+    
+    # Plotting: Linearized plot
+    plt.subplot(2, 3, 1)
+    plt.plot(time, concentration, 'o', label='Original Data')
+    plt.plot(time, predicted_concentration_zero, 'r-', label=f'Linear Fit (R²={zero_order_r_squared:.4f})')
+    plt.title('Zero-Order Plot\n$C_t$ vs. $t$')
+    plt.xlabel('Time (t)')
+    plt.ylabel('Concentration ($C_t$)')
+    plt.legend()
+    plt.grid(True)
+    
+    # Plotting: Residual plot
+    plt.subplot(2, 3, 4)
+    plt.plot(time, residuals_zero, 'o')
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.title('Zero-Order Residuals')
+    plt.xlabel('Time (t)')
+    plt.ylabel('Residual ($C_{t, actual} - C_{t, predicted}$)')
+    plt.grid(True)
+
+    # --- FIRST-ORDER KINETICS ---
+    # Linearized plot: ln(Ct/C0) vs. t
+    print("\n--- Testing First-Order Model ---")
+    
+    # Initial concentration
+    initial_concentration = concentration[0]
+    
+    # Calculate linearized data for y-axis
+    first_order_y = np.log(concentration / initial_concentration)
+    
+    # Perform linear regression
+    first_order_slope, first_order_intercept, first_order_r_value, _, _ = linregress(time, first_order_y)
+    first_order_r_squared = first_order_r_value**2
+    
+    # The rate constant k1 is the negative of the slope
+    k1 = -first_order_slope
+    
+    # Calculate predicted values and residuals for first-order
+    predicted_y_first = first_order_slope * time + first_order_intercept
+    residuals_first = first_order_y - predicted_y_first
+
+    # Store results
+    results['first_order'] = {'k': k1, 'r_squared': first_order_r_squared, 'residuals': residuals_first}
+    
+    # Print results for first-order model
+    print(f"Linearized equation: ln([Ct]/[C0]) = -k1*t")
+    print(f"Slope (linearized): {first_order_slope:.4f}")
+    print(f"Rate constant (k1): {k1:.4f}")
+    print(f"R-squared (R²): {first_order_r_squared:.4f}")
+    
+    # Plotting: Linearized plot
+    plt.subplot(2, 3, 2)
+    plt.plot(time, first_order_y, 'o', label='Linearized Data')
+    plt.plot(time, predicted_y_first, 'r-', label=f'Linear Fit (R²={first_order_r_squared:.4f})')
+    plt.title('First-Order Plot\n$ln(C_t/C_0)$ vs. $t$')
+    plt.xlabel('Time (t)')
+    plt.ylabel('$ln(C_t/C_0)$')
+    plt.legend()
+    plt.grid(True)
+
+    # Plotting: Residual plot
+    plt.subplot(2, 3, 5)
+    plt.plot(time, residuals_first, 'o')
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.title('First-Order Residuals')
+    plt.xlabel('Time (t)')
+    plt.ylabel('Residual ($ln(C_t/C_0)_{actual} - ln(C_t/C_0)_{predicted}$)')
+    plt.grid(True)
+    
+    # --- SECOND-ORDER KINETICS ---
+    # Linearized plot: 1/Ct vs. t
+    print("\n--- Testing Second-Order Model ---")
+    
+    # Calculate linearized data for y-axis
+    second_order_y = 1 / concentration
+    
+    # Perform linear regression
+    second_order_slope, second_order_intercept, second_order_r_value, _, _ = linregress(time, second_order_y)
+    second_order_r_squared = second_order_r_value**2
+    
+    # The rate constant k2 is the slope
+    k2 = second_order_slope
+    
+    # Calculate predicted values and residuals for second-order
+    predicted_y_second = second_order_slope * time + second_order_intercept
+    residuals_second = second_order_y - predicted_y_second
+
+    # Store results
+    results['second_order'] = {'k': k2, 'r_squared': second_order_r_squared, 'residuals': residuals_second}
+    
+    # Print results for second-order model
+    print(f"Linearized equation: 1/[Ct] = k2*t + 1/[C0]")
+    print(f"Slope (linearized): {second_order_slope:.4f}")
+    print(f"Rate constant (k2): {k2:.4f}")
+    print(f"R-squared (R²): {second_order_r_squared:.4f}")
+    
+    # Plotting: Linearized plot
+    plt.subplot(2, 3, 3)
+    plt.plot(time, second_order_y, 'o', label='Linearized Data')
+    plt.plot(time, predicted_y_second, 'r-', label=f'Linear Fit (R²={second_order_r_squared:.4f})')
+    plt.title('Second-Order Plot\n$1/C_t$ vs. $t$')
+    plt.xlabel('Time (t)')
+    plt.ylabel('$1/C_t$')
+    plt.legend()
+    plt.grid(True)
+    
+    # Plotting: Residual plot
+    plt.subplot(2, 3, 6)
+    plt.plot(time, residuals_second, 'o')
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.title('Second-Order Residuals')
+    plt.xlabel('Time (t)')
+    plt.ylabel('Residual ($1/C_{t, actual} - 1/C_{t, predicted}$)')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+    
+    # --- FINAL CONCLUSION ---
+    print("\n\n--- Conclusion ---")
+    best_fit_model = max(results, key=lambda model: results[model]['r_squared'])
+    best_r_squared = results[best_fit_model]['r_squared']
+    
+    print(f"The best-fit model for the data is the {best_fit_model.replace('_', '-')} model, with an R-squared value of {best_r_squared:.4f}.")
+
+
+##### Example Usage #####
+if __name__ == "__main__":
+    # Sample data for a zero-order reaction
+    # Uncomment the appropriate dataset to test different models
+    
+    # Example: data from https://doi.org/10.1016/j.lwt.2008.10.002
+    time_data = [0, 1, 2, 3, 4] # time data
+    concentration_data = [6.96, 5.24, 3.52, 2.41, 1.58] # lycopene concentrantion at 140 °C
+
+    fit_kinetic_models(time_data, concentration_data)

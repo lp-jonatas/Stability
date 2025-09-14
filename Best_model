@@ -2,15 +2,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
+import os
 
-def fit_kinetic_models(time, concentration):
+def fit_kinetic_models(time, concentration, save_plots=False):
     """
-    Analyzes a given dataset to determine the best-fit chemical kinetic model
-    (zero, first, or second order) using linearized plots and R-squared values.
-
-    Parameters:
-    time (list or numpy.array): The time data.
-    concentration (list or numpy.array): The concentration data.
+    Analyzes a given dataset to determine the best-fit chemical kinetic model (zero,
+    first, or second order) by performing linear regression on linearized data.
+    It calculates and compares the R-squared value for each model and generates
+    corresponding linearized and residual plots for visual analysis.
+    Optionally, it can save the plots to a local file.
     """
     
     # Convert input lists to numpy arrays for easier calculations
@@ -167,8 +167,13 @@ def fit_kinetic_models(time, concentration):
     plt.grid(True)
 
     plt.tight_layout()
+    
+    if save_plots:
+        file_path = 'kinetic_models_with_residuals.png'
+        plt.savefig(file_path)
+        print(f"\nGraphs saved to '{file_path}'")
+        
     plt.show()
-
     
     # --- FINAL CONCLUSION ---
     print("\n\n--- Conclusion ---")
@@ -178,13 +183,12 @@ def fit_kinetic_models(time, concentration):
     print(f"The best-fit model for the data is the {best_fit_model.replace('_', '-')} model, with an R-squared value of {best_r_squared:.4f}.")
 
 
-##### Example Usage #####
+# Example Usage
 if __name__ == "__main__":
-    # Sample data for a zero-order reaction
-    # Uncomment the appropriate dataset to test different models
-    
+        
     # Example: data from https://doi.org/10.1016/j.lwt.2008.10.002
-    time_data = [0, 1, 2, 3, 4] # time data
+    time_data = [0, 1, 2, 3, 4]                         # time data
     concentration_data = [6.96, 5.24, 3.52, 2.41, 1.58] # lycopene concentrantion at 140 °C
+  
 
     fit_kinetic_models(time_data, concentration_data)

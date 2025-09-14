@@ -170,7 +170,7 @@ def fit_kinetic_models(time, concentration, save_plots=False):
     
     if save_plots:
         file_path = 'kinetic_models_with_residuals.png'
-        plt.savefig(file_path)
+        plt.savefig(file_path, dpi=300)
         print(f"\nGraphs saved to '{file_path}'")
         
     plt.show()
@@ -191,4 +191,4 @@ if __name__ == "__main__":
     concentration_data = [6.96, 5.24, 3.52, 2.41, 1.58] # lycopene concentrantion at 140 °C
   
 
-    fit_kinetic_models(time_data, concentration_data)
+    fit_kinetic_models(time_data, concentration_data, save_plots=True)

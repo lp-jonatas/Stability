@@ -1,0 +1,68 @@
+import numpy as np
+from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
+
+# Dataset: Diffentent values of k under different humidities (note that here H is equal to water activity (aw) Reference: https://doi.org/10.1016/j.foodchem.2010.09.044
+H_data = np.array([0.17, 0.22, 0.32, 0.56, 0.75])
+k_1_data = np.array([0.017, 0.010, 0.007, 0.006, 0.005])
+
+# --- 1. Define Models ---
+# Exponential: k_1 = k_ref * exp(B * H)
+def exponential_model(H, k_ref, B):
+    return k_ref * np.exp(B * H)
+
+# Power: k_1 = k' * H^n
+def power_model(H, k_prime, n):
+    return k_prime * (H ** n)
+
+# --- 2. Fit Models using curve_fit ---
+# Fit Exponential Model
+popt_exp, pcov_exp = curve_fit(exponential_model, H_data, k_1_data)
+k_ref_fit, B_fit = popt_exp
+
+# Fit Power Model
+popt_pow, pcov_pow = curve_fit(power_model, H_data, k_1_data)
+k_prime_fit, n_fit = popt_pow
+
+# --- 3. Calculate R-squared for each model ---
+def calculate_r_squared(y_true, y_pred):
+    ss_res = np.sum((y_true - y_pred)**2)
+    ss_tot = np.sum((y_true - np.mean(y_true))**2)
+    return 1 - (ss_res / ss_tot)
+
+# R-squared for Exponential Model
+k_1_pred_exp = exponential_model(H_data, *popt_exp)
+r_squared_exp = calculate_r_squared(k_1_data, k_1_pred_exp)
+
+# R-squared for Power Model
+k_1_pred_pow = power_model(H_data, *popt_pow)
+r_squared_pow = calculate_r_squared(k_1_data, k_1_pred_pow)
+
+# --- 4. Print Results ---
+print("--- Results of Non-linear Curve Fitting ---")
+print("\nExponential Model Parameters:")
+print(f"k_ref = {k_ref_fit:.4f}")
+print(f"B = {B_fit:.4f}")
+print(f"R-squared = {r_squared_exp:.4f}")
+
+print("\nPower Model Parameters:")
+print(f"k' = {k_prime_fit:.4f}")
+print(f"n = {n_fit:.4f}")
+print(f"R-squared = {r_squared_pow:.4f}")
+
+# --- 5. Plot the Fits ---
+plt.figure(figsize=(10, 6))
+H_plot = np.linspace(min(H_data), max(H_data), 100)
+k_1_exp_fit = exponential_model(H_plot, *popt_exp)
+k_1_pow_fit = power_model(H_plot, *popt_pow)
+
+plt.scatter(H_data, k_1_data, color='red', label='Experimental Data', zorder=5)
+plt.plot(H_plot, k_1_exp_fit, 'b--', label=f'Exponential Fit ($R^2$={r_squared_exp:.4f})')
+plt.plot(H_plot, k_1_pow_fit, 'g-.', label=f'Power Fit ($R^2$={r_squared_pow:.4f})')
+
+plt.title('Non-linear Curve Fitting of Kinetic Models')
+plt.xlabel('Humidity (H)')
+plt.ylabel('Rate Constant ($k_1$)')
+plt.legend()
+plt.grid(True)
+plt.show()

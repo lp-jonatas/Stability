@@ -3,8 +3,8 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
 # Data
-H_data = np.array([0.17, 0.22, 0.32, 0.56, 0.75])
-k_1_data = np.array([0.017, 0.010, 0.007, 0.006, 0.005])
+H_data = np.array([0.17, 0.22, 0.32, 0.56, 0.75]) # Data from https://doi.org/10.1016/j.foodchem.2010.09.044
+k_1_data = np.array([0.017, 0.010, 0.007, 0.006, 0.005]) 
 
 # --- 1. Define Models ---
 # Exponential: k_1 = k_ref * exp(B * H)

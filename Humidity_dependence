@@ -2,11 +2,9 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
-# Dataset: Diffentent values of k under different moisture content (X, % w.b.), note that here H is equal to moisture content (X %) Reference: https://doi.org/10.1016/j.jfoodeng.2005.02.023
-# For illustration just data above X = 55 % was considered (temperature equal to 50° C).
-
-H_data = np.array([55, 65, 85, 95])
-k_1_data = np.array([2.75E-04, 3.19E-04, 4.53E-04, 5.53E-04])
+# Data
+H_data = np.array([0.17, 0.22, 0.32, 0.56, 0.75])
+k_1_data = np.array([0.017, 0.010, 0.007, 0.006, 0.005])
 
 # --- 1. Define Models ---
 # Exponential: k_1 = k_ref * exp(B * H)
@@ -67,7 +65,5 @@ plt.xlabel('Humidity (H)')
 plt.ylabel('Rate Constant ($k_1$)')
 plt.legend()
 plt.grid(True)
-
-# Save the figure with a high resolution (300 dpi)
-plt.savefig('kinetic_humidity_models.png', dpi=300)
+plt.savefig('kinetic_humidity.png', dpi=300)
 plt.show()
